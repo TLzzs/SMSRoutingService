@@ -1,0 +1,195 @@
+openapi: 3.0.3
+info:
+  title: SMS Routing Service API
+  version: 1.0.0
+  description: |
+    Routes outbound SMS to carriers by phone prefix, tracks message status,
+    and blocks sends to opted-out numbers.
+
+    **Carrier routing:** +61 → Telstra/Optus (alternate), +64 → Spark, other → Global.
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+tags:
+  - name: Messages
+    description: Send and retrieve SMS messages
+  - name: Opt-out
+    description: Manage phone number opt-outs
+
+paths:
+  /messages:
+    post:
+      tags: [Messages]
+      summary: Send SMS message
+      description: Validates the number, checks opt-out, routes to a carrier, and returns message id and status.
+      operationId: sendMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+            example:
+              destination_number: "+61491570156"
+              content: Hello world
+              format: SMS
+      responses:
+        '201':
+          description: Message created (DELIVERED or BLOCKED)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+              examples:
+                delivered:
+                  summary: Delivered
+                  value:
+                    id: 550e8400-e29b-41d4-a716-446655440000
+                    destination_number: "+61491570156"
+                    status: DELIVERED
+                    carrier: Telstra
+                blocked:
+                  summary: Blocked (opted out)
+                  value:
+                    id: 550e8400-e29b-41d4-a716-446655440001
+                    destination_number: "+61491570156"
+                    status: BLOCKED
+        '400':
+          description: Invalid request or phone number
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /messages/{id}:
+    get:
+      tags: [Messages]
+      summary: Get message by ID
+      description: Returns full message details including content and timestamps.
+      operationId: getMessageById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Message found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '404':
+          description: Message not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /optout/{phoneNumber}:
+    post:
+      tags: [Opt-out]
+      summary: Opt out phone number
+      description: Registers a number on the suppression list. Subsequent sends return BLOCKED. Idempotent.
+      operationId: optOut
+      parameters:
+        - name: phoneNumber
+          in: path
+          required: true
+          description: E.164 phone number (e.g. +61491570156)
+          schema:
+            type: string
+            example: "+61491570156"
+      responses:
+        '200':
+          description: Number opted out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptOutResponse'
+        '400':
+          description: Invalid phone number
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+components:
+  schemas:
+    SendMessageRequest:
+      type: object
+      required:
+        - destination_number
+        - content
+        - format
+      properties:
+        destination_number:
+          type: string
+          description: E.164 phone number
+          example: "+61491570156"
+        content:
+          type: string
+          description: Message body
+          example: Hello world
+        format:
+          type: string
+          description: Message format
+          example: SMS
+
+    MessageResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        destination_number:
+          type: string
+          example: "+61491570156"
+        content:
+          type: string
+        format:
+          type: string
+          example: SMS
+        status:
+          $ref: '#/components/schemas/MessageStatus'
+        carrier:
+          type: string
+          description: Carrier display name (omitted when BLOCKED)
+          example: Telstra
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    MessageStatus:
+      type: string
+      enum: [PENDING, SENT, DELIVERED, BLOCKED]
+
+    OptOutResponse:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          example: "+61491570156"
+        opted_out:
+          type: boolean
+          example: true
+
+    ProblemDetail:
+      type: object
+      description: RFC 7807 Problem Details
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
