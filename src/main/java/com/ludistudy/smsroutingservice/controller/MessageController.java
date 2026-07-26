@@ -4,6 +4,7 @@ import com.ludistudy.smsroutingservice.dto.MessageResponse;
 import com.ludistudy.smsroutingservice.dto.SendMessageRequest;
 import com.ludistudy.smsroutingservice.service.MessageService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,13 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/messages")
+@AllArgsConstructor
 public class MessageController {
 
     private final MessageService messageService;
-
-    public MessageController(MessageService messageService) {
-        this.messageService = messageService;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
