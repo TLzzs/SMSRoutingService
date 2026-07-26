@@ -17,5 +17,5 @@ public class SendMessageRequest {
     private String content;
 
     @NotBlank
-    private String format;
+    private String channel;
 }

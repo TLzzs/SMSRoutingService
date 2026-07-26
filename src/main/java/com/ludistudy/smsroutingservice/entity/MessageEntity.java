@@ -20,7 +20,7 @@ public class MessageEntity {
     private String id;
     private String destinationNumber;
     private String content;
-    private String format;
+    private String channel;
     private MessageStatus status;
     private Carrier carrier;
     private Instant createdAt;

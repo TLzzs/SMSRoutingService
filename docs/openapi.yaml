@@ -34,7 +34,7 @@ paths:
             example:
               destination_number: "+61491570156"
               content: Hello world
-              format: SMS
+              channel: SMS
       responses:
         '201':
           description: Message created (DELIVERED or BLOCKED)
@@ -125,7 +125,7 @@ components:
       required:
         - destination_number
         - content
-        - format
+        - channel
       properties:
         destination_number:
           type: string
@@ -135,9 +135,9 @@ components:
           type: string
           description: Message body
           example: Hello world
-        format:
+        channel:
           type: string
-          description: Message format
+          description: Message channel
           example: SMS
 
     MessageResponse:
@@ -151,7 +151,7 @@ components:
           example: "+61491570156"
         content:
           type: string
-        format:
+        channel:
           type: string
           example: SMS
         status:

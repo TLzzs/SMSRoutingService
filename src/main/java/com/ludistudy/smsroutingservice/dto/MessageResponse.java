@@ -21,7 +21,7 @@ public class MessageResponse {
     private String destinationNumber;
 
     private String content;
-    private String format;
+    private String channel;
     private MessageStatus status;
     private String carrier;
 
@@ -47,7 +47,7 @@ public class MessageResponse {
                 .id(message.getId())
                 .destinationNumber(message.getDestinationNumber())
                 .content(message.getContent())
-                .format(message.getFormat())
+                .channel(message.getChannel())
                 .status(message.getStatus())
                 .carrier(carrierDisplayName(message.getCarrier()))
                 .createdAt(message.getCreatedAt())

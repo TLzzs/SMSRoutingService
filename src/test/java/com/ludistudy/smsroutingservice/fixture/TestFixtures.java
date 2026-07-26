@@ -14,7 +14,7 @@ public final class TestFixtures {
     public static final String NZ_PHONE = "+64211234567";
     public static final String US_PHONE = "+14155552671";
     public static final String INVALID_PHONE = "invalid";
-    public static final String SMS_FORMAT = "SMS";
+    public static final String SMS_CHANNEL = "SMS";
 
     private TestFixtures() {
     }
@@ -23,7 +23,7 @@ public final class TestFixtures {
         SendMessageRequest request = new SendMessageRequest();
         request.setDestinationNumber(destinationNumber);
         request.setContent(content);
-        request.setFormat(SMS_FORMAT);
+        request.setChannel(SMS_CHANNEL);
         return request;
     }
 
@@ -36,9 +36,9 @@ public final class TestFixtures {
                 {
                   "destination_number": "%s",
                   "content": "%s",
-                  "format": "%s"
+                  "channel": "%s"
                 }
-                """.formatted(destinationNumber, content, SMS_FORMAT);
+                """.formatted(destinationNumber, content, SMS_CHANNEL);
     }
 
     public static String australianSmsJson(String content) {
@@ -50,7 +50,7 @@ public final class TestFixtures {
                 .id(id)
                 .destinationNumber(AU_PHONE)
                 .content(content)
-                .format(SMS_FORMAT)
+                .channel(SMS_CHANNEL)
                 .status(MessageStatus.DELIVERED)
                 .carrier(Carrier.TELSTRA)
                 .createdAt(Instant.parse("2026-07-10T00:00:00Z"))

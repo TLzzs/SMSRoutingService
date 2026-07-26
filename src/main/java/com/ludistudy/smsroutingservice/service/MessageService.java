@@ -8,6 +8,7 @@ import com.ludistudy.smsroutingservice.model.Carrier;
 import com.ludistudy.smsroutingservice.model.MessageStatus;
 import com.ludistudy.smsroutingservice.repository.MessageRepository;
 import com.ludistudy.smsroutingservice.validation.PhoneNumberValidator;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -18,24 +19,13 @@ import java.util.UUID;
  * Status transitions happen synchronously in one request (PENDING → SENT → DELIVERED, or PENDING → BLOCKED).
  */
 @Service
+@AllArgsConstructor
 public class MessageService {
 
     private final MessageRepository messageRepository;
     private final OptOutService optOutService;
     private final CarrierRouter carrierRouter;
     private final PhoneNumberValidator phoneNumberValidator;
-
-    public MessageService(
-            MessageRepository messageRepository,
-            OptOutService optOutService,
-            CarrierRouter carrierRouter,
-            PhoneNumberValidator phoneNumberValidator
-    ) {
-        this.messageRepository = messageRepository;
-        this.optOutService = optOutService;
-        this.carrierRouter = carrierRouter;
-        this.phoneNumberValidator = phoneNumberValidator;
-    }
 
     public MessageResponse send(SendMessageRequest request) {
         String destinationNumber = phoneNumberValidator.validateAndNormalize(request.getDestinationNumber());
@@ -45,7 +35,7 @@ public class MessageService {
                 .id(UUID.randomUUID().toString())
                 .destinationNumber(destinationNumber)
                 .content(request.getContent())
-                .format(request.getFormat())
+                .channel(request.getChannel())
                 .status(MessageStatus.PENDING)
                 .createdAt(now)
                 .updatedAt(now)

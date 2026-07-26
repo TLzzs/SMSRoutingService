@@ -37,7 +37,7 @@ Interactive API docs (Scalar): **http://localhost:8080/scalar/**
 # Send message (AU → Telstra on first send)
 curl -X POST http://localhost:8080/messages \
   -H "Content-Type: application/json" \
-  -d '{"destination_number":"+61491570156","content":"Hello","format":"SMS"}'
+  -d '{"destination_number":"+61491570156","content":"Hello","channel":"SMS"}'
 
 # Get message status (use id from send response)
 curl http://localhost:8080/messages/{id}
@@ -68,7 +68,7 @@ curl -X POST http://localhost:8080/messages \
   -d '{
     "destination_number": "+61491570156",
     "content": "Hello world",
-    "format": "SMS"
+    "channel": "SMS"
   }'
 ```
 
@@ -96,7 +96,7 @@ Response (`200 OK`):
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "destination_number": "+61491570156",
   "content": "Hello world",
-  "format": "SMS",
+  "channel": "SMS",
   "status": "DELIVERED",
   "carrier": "Telstra",
   "created_at": "2026-07-10T03:00:00Z",
